@@ -14,7 +14,6 @@ export class UserService extends AbstractService<User> {
 
     async findByHashId(id: string): Promise<User> {
         const users = await User.find();
-
         for (const user of users) {
             if (await bcrypt.compare(JSON.stringify(user.id), id)) {
                 return user;

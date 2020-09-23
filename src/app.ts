@@ -4,6 +4,11 @@ import bcrypt = require("bcrypt");
 import {Application, Request, Response} from "express";
 import {UserService} from "./service/UserService";
 import {User} from "./entity/User";
+import set = Reflect.set;
+import {CategoryService} from "./service/CategoryService";
+import {Category} from "./entity/Category";
+import {SubCategory} from "./entity/SubCategory";
+import {SubCategoryService} from "./service/SubCategoryService";
 
 const cors = require('cors');
 
@@ -28,7 +33,9 @@ export class App {
 
         this.plugins();
 
-        this.userRoute()
+        this.userRoute();
+        this.categoryRoute()
+        this.subCategoryRoute();
 
     }
 
@@ -46,7 +53,7 @@ export class App {
         this.app.post(`/${this.userRouteName}`, async (req: Request, res: Response) => {
 
             try {
-                await new UserService().save(new User(req.body.username, await bcrypt.hash(req.body.password, 10))).then(()=>{
+                await new UserService().save(new User(req.body.username, await bcrypt.hash(req.body.password, 10))).then(() => {
                     res.sendStatus(200);
                 })
             } catch (e) {
@@ -55,15 +62,10 @@ export class App {
         })
 
         this.app.post(`/${this.userRouteName}/auth`, async (req: Request, res: Response) => {
-            try {
+            const user = await new UserService().findByName(req.body.username);
+            const auth = ((user != null && await bcrypt.compare(req.body.password, user.password))
+                ? res.send(await bcrypt.hash(JSON.stringify(user.id), 10)) : res.sendStatus(403))
 
-                const user = await new UserService().findByName(req.body.username);
-                const auth = ((user != null && await bcrypt.compare(req.body.password, user.password))
-                    ? res.sendStatus(200) : res.sendStatus(403))
-
-            } catch {
-                res.sendStatus(500);
-            }
         })
 
         this.app.post(`/${this.userRouteName}/findUserByHash`, async (req: Request, res: Response) => {
@@ -74,5 +76,45 @@ export class App {
             }
         })
 
+    }
+
+    protected categoryRoute() {
+        this.app.post(`/${this.categoryRouteName}`, async (req: Request, res: Response) => {
+            try {
+                await new CategoryService().save(new Category(req.body.title)).then(() => {
+                    res.sendStatus(200)
+                })
+            } catch (e) {
+                res.sendStatus(500);
+            }
+        })
+
+        this.app.get(`/${this.categoryRouteName}`, async (req: Request, res: Response) => {
+            try {
+                res.send(await new CategoryService().getAll());
+            } catch (e) {
+                res.sendStatus(500)
+            }
+        })
+    }
+
+    protected subCategoryRoute() {
+        this.app.post(`/${this.subCategoryRouteName}`, async (req: Request, res: Response) => {
+            try {
+                await new SubCategoryService().save(new SubCategory(req.body.title, req.body.idCategory)).then(() => {
+                    res.sendStatus(200);
+                });
+            } catch (e) {
+                res.sendStatus(500)
+            }
+        })
+
+        this.app.get(`/${this.subCategoryRouteName}`, async (req: Request, res: Response) => {
+            try {
+                res.send(await new SubCategoryService().getAll());
+            } catch (e) {
+                res.sendStatus(500)
+            }
+        })
     }
 }

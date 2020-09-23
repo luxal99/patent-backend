@@ -4,9 +4,9 @@ import {SubCategory} from "./SubCategory";
 @Entity()
 export class Category extends BaseEntity {
 
-    @PrimaryGeneratedColumn() private _id: number;
+    @PrimaryGeneratedColumn() id: number;
 
-    @Column() private _title: string;
+    @Column() title: string;
 
 
     @OneToMany(type => SubCategory, listOfSubCategories => listOfSubCategories.idCategory)
@@ -14,15 +14,7 @@ export class Category extends BaseEntity {
 
     constructor(title?: string) {
         super();
-        this._title = title;
+        this.title = title;
     }
 
-
-    get title(): string {
-        return this._title;
-    }
-
-    set title(value: string) {
-        this._title = value;
-    }
 }
