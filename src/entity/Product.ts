@@ -19,4 +19,12 @@ export class Product extends BaseEntity {
     @ManyToOne(type => Manufacturer, id => id.listOfProducts)
     idManufacturer: Manufacturer
 
+
+    constructor(title?: string, price?: number, amount?: number, idManufacturer?: Manufacturer) {
+        super();
+        this.title = title;
+        this.price = price;
+        this.amount = amount;
+        this.idManufacturer = idManufacturer;
+    }
 }

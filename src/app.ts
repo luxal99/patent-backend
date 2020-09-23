@@ -11,6 +11,8 @@ import {SubCategory} from "./entity/SubCategory";
 import {SubCategoryService} from "./service/SubCategoryService";
 import {ManufacturerService} from "./service/ManufacturerService";
 import {Manufacturer} from "./entity/Manufacturer";
+import {Product} from "./entity/Product";
+import {ProductService} from "./service/ProductService";
 
 const cors = require('cors');
 
@@ -41,9 +43,9 @@ export class App {
         this.categoryRoute()
         this.subCategoryRoute();
         this.manufacturerRoute();
+        this.productRoute();
 
     }
-
 
     plugins() {
         this.app.use(bodyParser.urlencoded({extended: false}))
@@ -137,6 +139,31 @@ export class App {
         this.app.get(`/${this.subCategoryRouteName}`, async (req: Request, res: Response) => {
             try {
                 res.send(await new SubCategoryService().getAll());
+            } catch (e) {
+                res.sendStatus(500)
+            }
+        })
+    }
+
+    protected productRoute() {
+        this.app.post(`/${this.productRouteName}`, async (req: Request, res: Response) => {
+            try {
+                await new ProductService().save(new Product(
+                    req.body.title,
+                    req.body.price,
+                    req.body.amount,
+                    req.body.idManufacturer
+                )).then(() => {
+                    res.sendStatus(200)
+                })
+            } catch (e) {
+                res.sendStatus(500)
+            }
+        })
+
+        this.app.get(`/${this.productRouteName}`, async (req: Request, res: Response) => {
+            try {
+                res.send(await new ProductService().getAll());
             } catch (e) {
                 res.sendStatus(500)
             }
