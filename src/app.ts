@@ -9,6 +9,8 @@ import {CategoryService} from "./service/CategoryService";
 import {Category} from "./entity/Category";
 import {SubCategory} from "./entity/SubCategory";
 import {SubCategoryService} from "./service/SubCategoryService";
+import {ManufacturerService} from "./service/ManufacturerService";
+import {Manufacturer} from "./entity/Manufacturer";
 
 const cors = require('cors');
 
@@ -20,9 +22,10 @@ export class App {
     private categoryRouteName: string;
     private subCategoryRouteName: string;
     private productRouteName: string;
+    private manufacturerRouteName: string;
     private userRouteName: string;
 
-    constructor(userRouteName, categoryRouteName, subCategoryRouteName, productRouteName) {
+    constructor(userRouteName, categoryRouteName, subCategoryRouteName, productRouteName, manufacturerRouteName) {
 
         this.app = express();
 
@@ -30,12 +33,14 @@ export class App {
         this.subCategoryRouteName = subCategoryRouteName;
         this.productRouteName = productRouteName;
         this.userRouteName = userRouteName;
+        this.manufacturerRouteName = manufacturerRouteName;
 
         this.plugins();
 
         this.userRoute();
         this.categoryRoute()
         this.subCategoryRoute();
+        this.manufacturerRoute();
 
     }
 
@@ -92,6 +97,26 @@ export class App {
         this.app.get(`/${this.categoryRouteName}`, async (req: Request, res: Response) => {
             try {
                 res.send(await new CategoryService().getAll());
+            } catch (e) {
+                res.sendStatus(500)
+            }
+        })
+    }
+
+    protected manufacturerRoute() {
+        this.app.post(`/${this.manufacturerRouteName}`, async (req: Request, res: Response) => {
+            try {
+                await new ManufacturerService().save(new Manufacturer(req.body.title)).then(() => {
+                    res.sendStatus(200);
+                })
+            } catch (e) {
+                res.sendStatus(500)
+            }
+        })
+
+        this.app.get(`/${this.manufacturerRouteName}`, async (req: Request, res: Response) => {
+            try {
+                res.send(await new ManufacturerService().getAll());
             } catch (e) {
                 res.sendStatus(500)
             }

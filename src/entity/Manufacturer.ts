@@ -13,7 +13,7 @@ export class Manufacturer extends BaseEntity {
     @OneToMany(type => Product, listOfProducts => listOfProducts.idManufacturer)
     listOfProducts: Product[];
 
-    constructor(title: string) {
+    constructor(title?: string) {
         super();
         this.title = title;
     }
