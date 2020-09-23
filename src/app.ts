@@ -152,7 +152,8 @@ export class App {
                     req.body.title,
                     req.body.price,
                     req.body.amount,
-                    req.body.idManufacturer
+                    req.body.idManufacturer,
+                    req.body.code
                 )).then(() => {
                     res.sendStatus(200)
                 })

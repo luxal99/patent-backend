@@ -16,15 +16,19 @@ export class Product extends BaseEntity {
     @Column()
     amount: number;
 
+    @Column()
+    code: string;
+
     @ManyToOne(type => Manufacturer, id => id.listOfProducts)
     idManufacturer: Manufacturer
 
 
-    constructor(title?: string, price?: number, amount?: number, idManufacturer?: Manufacturer) {
+    constructor(title?: string, price?: number, amount?: number, idManufacturer?: Manufacturer,code?:string) {
         super();
         this.title = title;
         this.price = price;
         this.amount = amount;
         this.idManufacturer = idManufacturer;
+        this.code = code;
     }
 }
