@@ -13,11 +13,12 @@ import {ManufacturerService} from "./service/ManufacturerService";
 import {Manufacturer} from "./entity/Manufacturer";
 import {Product} from "./entity/Product";
 import {ProductService} from "./service/ProductService";
+import {WorkOrder} from "./entity/WorkOrder";
+import {WorkOrderService} from "./service/WorkOrderService";
 
 const cors = require('cors');
 
 export class App {
-
 
     public app: Application;
 
@@ -26,8 +27,10 @@ export class App {
     private productRouteName: string;
     private manufacturerRouteName: string;
     private userRouteName: string;
+    private workOrderRouteName: string
 
-    constructor(userRouteName, categoryRouteName, subCategoryRouteName, productRouteName, manufacturerRouteName) {
+
+    constructor(userRouteName, categoryRouteName, subCategoryRouteName, productRouteName, manufacturerRouteName, workOrderRouteName) {
 
         this.app = express();
 
@@ -36,6 +39,7 @@ export class App {
         this.productRouteName = productRouteName;
         this.userRouteName = userRouteName;
         this.manufacturerRouteName = manufacturerRouteName;
+        this.workOrderRouteName = workOrderRouteName;
 
         this.plugins();
 
@@ -44,6 +48,7 @@ export class App {
         this.subCategoryRoute();
         this.manufacturerRoute();
         this.productRoute();
+        this.workOrderRoute();
 
     }
 
@@ -153,7 +158,8 @@ export class App {
                     req.body.price,
                     req.body.amount,
                     req.body.idManufacturer,
-                    req.body.code
+                    req.body.code,
+                    req.body.idSubCategory
                 )).then(() => {
                     res.sendStatus(200)
                 })
@@ -162,9 +168,40 @@ export class App {
             }
         })
 
+        this.app.put(`/${this.productRouteName}`, async (req: Request, res: Response) => {
+            try {
+                const product: Product = req.body;
+                await new ProductService().update(product).then(() => {
+                    res.sendStatus(200);
+                });
+            } catch (e) {
+                res.send(e);
+            }
+        })
+
         this.app.get(`/${this.productRouteName}`, async (req: Request, res: Response) => {
             try {
                 res.send(await new ProductService().getAll());
+            } catch (e) {
+                res.sendStatus(500)
+            }
+        })
+    }
+
+    protected workOrderRoute() {
+        this.app.post(`/${this.workOrderRouteName}`, async (req: Request, res: Response) => {
+            try {
+                await new WorkOrderService().save(new WorkOrder(req.body.date)).then(() => {
+                    res.send(200);
+                })
+            } catch (e) {
+                res.sendStatus(500);
+            }
+        })
+
+        this.app.get(`/${this.workOrderRouteName}`, async (req: Request, res: Response) => {
+            try {
+                res.send(await new WorkOrderService().getAll());
             } catch (e) {
                 res.sendStatus(500)
             }

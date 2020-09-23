@@ -1,4 +1,4 @@
-import {BaseEntity, EntityManager, getManager} from "typeorm";
+import {BaseEntity, EntityManager, getConnection, getManager} from "typeorm";
 
 export class AbstractService<T extends BaseEntity> {
 
@@ -9,6 +9,7 @@ export class AbstractService<T extends BaseEntity> {
     constructor() {
         this.manager = getManager();
     }
+
 
     async save(entity: T) {
         await this.manager.save(entity);
