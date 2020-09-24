@@ -209,15 +209,17 @@ export class App {
 
         this.app.get(`/${this.workOrderRouteName}/:id`, async (req: Request, res: Response) => {
 
+            try {
                 res.send(await new WorkOrderService().getWorkOrderItems(req.params.id))
+            } catch (e) {
+                res.sendStatus(500);
+            }
 
         })
-        this.app.put(`/${this.workOrderRouteName}`, async (req: Request, res: Response) => {
+        this.app.post(`/${this.workOrderRouteName}/addProducts`, async (req: Request, res: Response) => {
             try {
+
                 let listOfProducts: Array<Product> = req.body.listOfProducts;
-
-
-                console.log(listOfProducts)
                 for (const product of listOfProducts) {
 
                     let workOrder = new WorkOrder();
