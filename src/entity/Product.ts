@@ -1,7 +1,8 @@
-import {BaseEntity, Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity, Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn} from "typeorm";
 import {Manufacturer} from "./Manufacturer";
 import {SubCategory} from "./SubCategory";
 import {WorkOrder} from "./WorkOrder";
+import {WorkOrderAndProduct} from "./WorkOrderAndProduct";
 
 @Entity()
 export class Product extends BaseEntity {
@@ -27,8 +28,8 @@ export class Product extends BaseEntity {
     @ManyToOne(type => SubCategory, id => id.listOfProducts)
     idSubCategory: SubCategory
 
-    @ManyToMany(type => WorkOrder, product => product.listOfProduct)
-    listOfWorkOrder: Product[];
+    @OneToMany(type => WorkOrderAndProduct, listOfWorkOrders => listOfWorkOrders.idWorkOrder)
+    listOfWorkOrders: WorkOrderAndProduct[];
 
 
     constructor(title?: string, price?: number, amount?: number, idManufacturer?: Manufacturer, code?: string, idSubCategory?) {

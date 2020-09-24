@@ -15,6 +15,9 @@ import {Product} from "./entity/Product";
 import {ProductService} from "./service/ProductService";
 import {WorkOrder} from "./entity/WorkOrder";
 import {WorkOrderService} from "./service/WorkOrderService";
+import {WorkOrderAndProduct} from "./entity/WorkOrderAndProduct";
+import {createDeflateRaw} from "zlib";
+import {WorkOrderAndProductService} from "./service/WorkOrderAndProductService";
 
 const cors = require('cors');
 
@@ -191,19 +194,43 @@ export class App {
     protected workOrderRoute() {
         this.app.post(`/${this.workOrderRouteName}`, async (req: Request, res: Response) => {
             try {
-                await new WorkOrderService().save(new WorkOrder(req.body.date)).then(() => {
+                await new WorkOrderService().save(new WorkOrder(req.body.date, req.body.listOfProducts)).then(() => {
                     res.send(200);
                 })
             } catch (e) {
-                res.sendStatus(500);
+                res.sendStatus(e);
             }
         })
 
         this.app.get(`/${this.workOrderRouteName}`, async (req: Request, res: Response) => {
+            res.send(await new WorkOrderService().getAll());
+
+        })
+
+        this.app.get(`/${this.workOrderRouteName}/:id`, async (req: Request, res: Response) => {
+
+                res.send(await new WorkOrderService().getWorkOrderItems(req.params.id))
+
+        })
+        this.app.put(`/${this.workOrderRouteName}`, async (req: Request, res: Response) => {
             try {
-                res.send(await new WorkOrderService().getAll());
+                let listOfProducts: Array<Product> = req.body.listOfProducts;
+
+
+                console.log(listOfProducts)
+                for (const product of listOfProducts) {
+
+                    let workOrder = new WorkOrder();
+                    workOrder.id = req.body.id;
+
+                    let workOrderAndProduct = new WorkOrderAndProduct(workOrder, product);
+                    await new WorkOrderAndProductService().save(workOrderAndProduct);
+                }
+
+                res.sendStatus(200);
+
             } catch (e) {
-                res.sendStatus(500)
+                res.sendStatus(e)
             }
         })
     }

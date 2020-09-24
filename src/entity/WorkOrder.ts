@@ -1,5 +1,15 @@
-import {BaseEntity, Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn} from "typeorm";
+import {
+    BaseEntity,
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinTable,
+    ManyToMany,
+    OneToMany,
+    PrimaryGeneratedColumn
+} from "typeorm";
 import {Product} from "./Product";
+import {WorkOrderAndProduct} from "./WorkOrderAndProduct";
 
 @Entity()
 export class WorkOrder extends BaseEntity {
@@ -9,12 +19,12 @@ export class WorkOrder extends BaseEntity {
     @Column()
     date: string;
 
-    @ManyToMany(type => Product, product => product.listOfWorkOrder)
-    @JoinTable()
-    listOfProduct: Product[];
+    @OneToMany(type => WorkOrderAndProduct, listOfWorkOrders => listOfWorkOrders.idWorkOrder)
+    listOfWorkOrders: WorkOrderAndProduct[];
 
+    listOfProducts:Product[]
 
-    constructor(date?: string) {
+    constructor(date?: string, listOfProducts?: Product[]) {
         super();
         this.date = date;
     }
