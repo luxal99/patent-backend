@@ -15,19 +15,23 @@ export class WorkOrderService extends AbstractService<WorkOrder> {
     }
 
     async getWorkOrderItems(id) {
-        const sql = await this.manager.query(`select idProductId,title, count(idProductId)  as 'amounts',price
+        const sql = await this.manager.query(`select wo.date ,idProductId,title, count(idProductId)  as 'amounts',price
         from work_order_and_product
         join product p on p.id = work_order_and_product.idProductId 
+        join work_order wo on wo.id = work_order_and_product.idWorkOrderId
         where idWorkOrderId =${id} 
         group by idProductId`);
 
-        let workOrderDTO = new WorkOrderDTO(Number.parseInt(id));
+        let workOrderDTO = new WorkOrderDTO(Number.parseInt(id),sql[0].date);
+
         sql.forEach(product => {
             let productDTO = new ProductDTO(product.idProductId, product.title, Number.parseInt(product.amounts),
                 product.price, product.price * Number.parseInt(product.amounts))
 
             workOrderDTO.listOfProduct.push(productDTO);
         })
+
+        console.log(workOrderDTO)
 
         return workOrderDTO;
     }
