@@ -31,8 +31,6 @@ export class WorkOrderService extends AbstractService<WorkOrder> {
             workOrderDTO.listOfProduct.push(productDTO);
         })
 
-        console.log(workOrderDTO)
-
         return workOrderDTO;
     }
 }
